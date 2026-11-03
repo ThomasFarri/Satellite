@@ -1,0 +1,154 @@
+{
+  "checks": [
+    {
+      "name": "Two-body energy conservation, 2 days",
+      "method": "DOP853 rtol 1e-11, max relative change",
+      "tolerance": "< 1e-9",
+      "measured": "1.5e-11",
+      "status": "Pass"
+    },
+    {
+      "name": "Two-body angular momentum conservation, 2 days",
+      "method": "max relative change of h vector",
+      "tolerance": "< 1e-9",
+      "measured": "7.7e-12",
+      "status": "Pass"
+    },
+    {
+      "name": "Two-body period",
+      "method": "position after one analytic period vs start",
+      "tolerance": "< 1 mm",
+      "measured": "0.119 mm (period 5684.920 s)",
+      "status": "Pass"
+    },
+    {
+      "name": "J2 RAAN drift rate, 5 days",
+      "method": "linear fit of osculating RAAN vs analytic secular rate",
+      "tolerance": "within 2 %",
+      "measured": "0.98634 vs 0.98565 deg/day (0.07 %)",
+      "status": "Pass"
+    },
+    {
+      "name": "SGP4 vs numerical J2 divergence, 24 h",
+      "method": "max position difference, RIC components",
+      "tolerance": "Characterisation",
+      "measured": "2.93 km total (R 0.45, I 2.93, C 0.27 km)",
+      "status": "Characterised"
+    },
+    {
+      "name": "SGP4 vs numerical J2 divergence, 7 days",
+      "method": "max position difference, RIC components",
+      "tolerance": "Characterisation",
+      "measured": "20.80 km total (R 3.14, I 20.80, C 1.89 km)",
+      "status": "Characterised"
+    },
+    {
+      "name": "Handwritten ENU chain vs astropy AltAz",
+      "method": "topocentric ITRS to AltAz, refraction off, 1 day at 30 s",
+      "tolerance": "1e-9 rad, 1 mm",
+      "measured": "el 2.0e-15 rad, az 1.5e-14 rad, range 7.45e-06 mm",
+      "status": "Pass"
+    },
+    {
+      "name": "Rise and set refinement",
+      "method": "elevation 10 ms either side of each refined crossing straddles the 20 deg threshold",
+      "tolerance": "all crossings within 10 ms",
+      "measured": "14 passes, 28 crossings checked",
+      "status": "Pass"
+    },
+    {
+      "name": "Point-ahead, independent inertial route",
+      "method": "ITRS axes with omega x r vs astropy GCRS satellite and station velocities",
+      "tolerance": "within 0.1 %",
+      "measured": "max relative difference 5.0e-08",
+      "status": "Pass"
+    },
+    {
+      "name": "Point-ahead magnitude sanity",
+      "method": "2 v_perp / c over all geometric passes",
+      "tolerance": "order 50 urad (20 to 60 urad)",
+      "measured": "25.1 to 51.5 urad",
+      "status": "Pass"
+    },
+    {
+      "name": "Skyfield rise/set, default Skyfield settings",
+      "method": "same SGP4 Satrec, find_events at 20 deg, 7 days",
+      "tolerance": "< 1 s (investigate above)",
+      "measured": "14 vs 14 passes; max rise diff 0.140 s, max set diff 0.207 s (find_events alone); 0.041 s with crossings refined to 1 ms",
+      "status": "Pass"
+    },
+    {
+      "name": "Skyfield elevation, default Skyfield settings",
+      "method": "10 s grid, 7 days, el > 0",
+      "tolerance": "Characterisation",
+      "measured": "max 0.0130 deg; UT1-UTC Skyfield +0.0958 s vs astropy -0.1748 s; no polar motion in Skyfield",
+      "status": "Explained"
+    },
+    {
+      "name": "Skyfield with the same IERS data and polar motion",
+      "method": "Skyfield timescale from astropy's bundled finals2000A.all; Skyfield altitude crossings refined with brentq to 1 ms",
+      "tolerance": "rise/set < 10 ms, el < 1e-4 deg",
+      "measured": "max rise diff 0.43 ms, max set diff 0.16 ms, max el diff 1.5e-05 deg, peak el diff 1.4e-07 deg",
+      "status": "Pass"
+    },
+    {
+      "name": "Post-pass bias and timing recovery (SYNTHETIC telemetry)",
+      "method": "least squares on the highest geometric pass (no. 7 of 14 unconstrained), noise 0.002 deg",
+      "tolerance": "0.001 deg, 0.01 s",
+      "measured": "az bias err -0.00005 deg, el bias err -0.00016 deg, timing err +0.00000 s",
+      "status": "Pass"
+    },
+    {
+      "name": "STK Access and AER comparison",
+      "method": "validation/compare_stk.py on exported CSVs",
+      "tolerance": "rise/set 1 s, el 0.01 deg",
+      "measured": "-",
+      "status": "Not yet run"
+    }
+  ],
+  "details": {
+    "divergence": {
+      "24 h": {
+        "total_km": 2.9346720462731057,
+        "radial_km": 0.4486455254776964,
+        "intrack_km": 2.9346404064830094,
+        "crosstrack_km": 0.26736019728330557
+      },
+      "7 days": {
+        "total_km": 20.80300997267556,
+        "radial_km": 3.139263149532236,
+        "intrack_km": 20.799300560634148,
+        "crosstrack_km": 1.889552655041789
+      }
+    },
+    "point_ahead_urad": [
+      25.071330151973772,
+      51.50649793547941
+    ],
+    "skyfield": {
+      "default": {
+        "n_ours": 14,
+        "n_skyfield": 14,
+        "max_rise_diff_s": 0.13986259352532215,
+        "max_set_diff_s": 0.2065486221399624,
+        "max_rise_diff_refined_s": 0.040712898946367204,
+        "max_set_diff_refined_s": 0.03160657099215314,
+        "max_el_diff_deg": 0.01303151845793087,
+        "max_peak_el_diff_deg": 0.012798240094444031,
+        "dut1_s": 0.09577614076277996
+      },
+      "same_iers": {
+        "n_ours": 14,
+        "n_skyfield": 14,
+        "max_rise_diff_s": 0.13986259352532215,
+        "max_set_diff_s": 0.16973132349085063,
+        "max_rise_diff_refined_s": 0.0004299040883779526,
+        "max_set_diff_refined_s": 0.00015865173190832138,
+        "max_el_diff_deg": 1.5352272659886054e-05,
+        "max_peak_el_diff_deg": 1.4203770713132805e-07,
+        "dut1_s": -0.17479250000000945
+      },
+      "astropy_dut1_s": -0.1747925
+    }
+  }
+}

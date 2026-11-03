@@ -1,0 +1,59 @@
+# Example scenario: synthetic dawn-dusk sun-synchronous satellite over an optical
+# ground station. All terminal and link values are illustrative assumptions for a
+# generic small optical terminal. They do not describe any real product.
+
+scenario:
+  name: example-sso-tenerife
+  epoch_utc: "2027-03-01T00:00:00"
+  duration_days: 7
+  coarse_step_s: 30        # elevation sampling step before root refinement
+  profile_step_s: 2        # pointing profile sampling step inside passes
+  propagator: sgp4         # sgp4 or j2
+
+orbit:
+  # Inclination is computed from the J2 sun-synchronous condition and RAAN from
+  # the Sun's position at epoch, so neither is set here.
+  altitude_km: 500
+  eccentricity: 0.0001
+  ltan_hours: 6.0          # local time of ascending node (dawn-dusk)
+  arg_perigee_deg: 0
+  mean_anomaly_deg: 0
+  bstar: 0.0               # drag off so the SGP4 and J2 propagators are comparable
+
+station:
+  # ESA Optical Ground Station, Observatorio del Teide, Tenerife.
+  # Approximate public values, rounded.
+  name: OGS Tenerife (approx.)
+  lat_deg: 28.30
+  lon_deg: -16.51
+  height_m: 2393
+
+constraints:
+  min_elevation_deg: 20
+  min_sun_separation_deg: 30
+  night_only: true
+  night_sun_elevation_deg: -6   # civil twilight limit
+
+terminal:
+  # Illustrative values only.
+  tx_power_w: 1.0
+  divergence_half_angle_urad: 30     # 1/e^2 half-angle
+  rx_aperture_diameter_m: 0.4
+  optics_efficiency: 0.5             # combined transmit and receive optics
+  zenith_transmission: 0.8
+  pointing_error_urad: 5
+  data_rate_gbps: 1.0
+  required_rx_power_w: 1.0e-5        # -20 dBm, illustrative receiver requirement
+  pointing_error_sweep_urad: [1, 5, 10, 15, 20, 25]
+
+planning:
+  max_sessions: 10
+
+postpass:
+  # Synthetic telemetry generator settings. Injected errors to recover.
+  bias_az_deg: 0.02
+  bias_el_deg: -0.01
+  timing_offset_s: 0.25
+  noise_deg: 0.002
+  sample_step_s: 0.5
+  seed: 1
