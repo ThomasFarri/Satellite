@@ -9,11 +9,11 @@ from opticalpass.planning import PassSummary, rank_passes, select_sessions
 from tests.conftest import ROOT
 
 
-def _short_config(tmp_path, **overrides):
+def _short_config(tmp_path, overrides=None):
     with open(ROOT / "configs" / "example.yaml") as fh:
         raw = yaml.safe_load(fh)
     raw["scenario"]["duration_days"] = 1.0
-    for (section, key), value in overrides.items():
+    for (section, key), value in (overrides or {}).items():
         raw[section][key] = value
     path = tmp_path / "cfg.yaml"
     path.write_text(yaml.safe_dump(raw))
@@ -34,7 +34,7 @@ def test_plan_command_writes_outputs(tmp_path):
 
 
 def test_plan_with_no_passes(tmp_path):
-    cfg = _short_config(tmp_path, **{("constraints", "min_elevation_deg"): 89.0})
+    cfg = _short_config(tmp_path, {("constraints", "min_elevation_deg"): 89.0})
     out = tmp_path / "out"
     assert main(["plan", "--config", str(cfg), "--out", str(out)]) == 0
     with open(out / "passes.csv") as fh:
@@ -43,7 +43,7 @@ def test_plan_with_no_passes(tmp_path):
 
 
 def test_plan_bad_config_returns_error(tmp_path):
-    cfg = _short_config(tmp_path, **{("orbit", "altitude_km"): -1})
+    cfg = _short_config(tmp_path, {("orbit", "altitude_km"): -1})
     assert main(["plan", "--config", str(cfg), "--out", str(tmp_path / "o")]) == 2
 
 
