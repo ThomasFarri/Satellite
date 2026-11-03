@@ -15,7 +15,8 @@ import numpy as np
 from astropy.time import Time
 from numpy.typing import ArrayLike, NDArray
 from scipy.integrate import solve_ivp
-from sgp4.api import WGS84, Satrec
+from sgp4.api import WGS72, WGS84, Satrec
+from sgp4.exporter import export_tle
 
 from opticalpass.constants import J2_EARTH, MU_EARTH_M3_S2, R_EARTH_EQ_M
 from opticalpass.orbit import MeanElements
@@ -67,7 +68,7 @@ class SGP4Propagator:
 
     def __init__(self, elements: MeanElements, satnum: int = 99999) -> None:
         self.epoch = elements.epoch
-        self.elements = elements
+        self.elements: MeanElements | None = elements
         sat = Satrec()
         epoch_days = (elements.epoch.utc.jd1 - _SGP4_EPOCH_JD) + elements.epoch.utc.jd2
         # sgp4init wants mean motion in rad/min (Kozai convention) and angles in rad.
@@ -81,6 +82,27 @@ class SGP4Propagator:
         if sat.error != 0:
             raise RuntimeError(f"sgp4init failed with error code {sat.error}")
         self.satrec = sat
+
+    @classmethod
+    def from_tle(cls, line1: str, line2: str, epoch: Time) -> SGP4Propagator:
+        """SGP4 from a two-line element set, with times counted from ``epoch``.
+
+        Uses WGS72 constants, the standard for TLEs and the default in most tools
+        that read them (including STK's SGP4 propagator).
+        """
+        sat = Satrec.twoline2rv(line1.rstrip(), line2.rstrip(), WGS72)
+        if sat.error != 0:
+            raise ValueError(f"Could not parse TLE (sgp4 error {sat.error})")
+        obj = cls.__new__(cls)
+        obj.epoch = epoch
+        obj.elements = None
+        obj.satrec = sat
+        return obj
+
+    def to_tle(self) -> tuple[str, str]:
+        """Export the current satellite as a TLE. TLE fields round the elements
+        (angles to 1e-4 deg), so rebuild from the TLE when comparing tools."""
+        return export_tle(self.satrec)
 
     def propagate(self, t_s: ArrayLike) -> StateVectors:
         t = _as_time_array(t_s)
