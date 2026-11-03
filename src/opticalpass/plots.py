@@ -152,3 +152,25 @@ def plot_sensitivity(rows: Sequence, path: Path) -> Path:
     fig.savefig(path, dpi=150)
     plt.close(fig)
     return path
+
+
+def plot_postpass(tel, res, path: Path) -> Path:
+    """Residuals before and after removing the fitted bias and timing offset."""
+    fig, axes = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
+    tm = (tel.t_s - tel.t_s[0]) / 60.0
+    for ax, raw, post, name in (
+            (axes[0], res.raw_residual_az_rad, res.residual_az_rad, "Azimuth"),
+            (axes[1], res.raw_residual_el_rad, res.residual_el_rad, "Elevation")):
+        ax.plot(tm, np.degrees(raw) * 1e3, color="0.6", linestyle="-", linewidth=1.0,
+                label="Measured minus predicted")
+        ax.plot(tm, np.degrees(post) * 1e3, color="0.0", linestyle="none", marker=".",
+                markersize=2, label="After fitted bias and timing removed")
+        ax.set_ylabel(f"{name} residual [mdeg]")
+        ax.grid(True, color="0.85")
+    axes[0].legend(fontsize=8)
+    axes[1].set_xlabel("Time from first sample [min]")
+    axes[0].set_title("Post-pass residuals (SYNTHETIC telemetry)")
+    fig.tight_layout()
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+    return path
